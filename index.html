@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>火山石 AI 助手 — 团队使用手册</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #1e293b;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --tag-ai: #818cf8;
+    --tag-hardtech: #34d399;
+    --tag-medical: #f472b6;
+    --tag-secondary: #fbbf24;
+    --tag-content: #a78bfa;
+    --tag-legal: #94a3b8;
+    --tag-fund: #fb923c;
+    --tag-admin: #67e8f9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+  }
+  .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+  .header p { font-size: 1.1em; opacity: 0.9; }
+  .header .version {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    margin-top: 12px;
+  }
+
+  /* Navigation */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    z-index: 100;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-bar a {
+    display: inline-block;
+    padding: 14px 16px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: color 0.2s;
+  }
+  .nav-bar a:hover { color: var(--primary); }
+
+  /* Container */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 48px;
+  }
+  .section-title {
+    font-size: 1.6em;
+    font-weight: 700;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-subtitle {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin: 20px 0 12px;
+    color: var(--text);
+  }
+
+  /* Cards */
+  .agent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+  }
+  .agent-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 20px;
+    transition: box-shadow 0.2s;
+  }
+  .agent-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .agent-card .name {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .agent-card .focus {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+  .agent-card ul {
+    list-style: none;
+    padding: 0;
+  }
+  .agent-card li {
+    font-size: 0.9em;
+    padding: 3px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .agent-card li::before {
+    content: "•";
+    position: absolute;
+    left: 4px;
+    color: var(--primary);
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.75em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+  .badge-ok { background: #dcfce7; color: #166534; }
+  .agent-tag {
+    display: inline-block;
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 6px;
+    color: white;
+    margin-left: 6px;
+  }
+  .tag-ai { background: var(--tag-ai); }
+  .tag-hardtech { background: var(--tag-hardtech); color: #000; }
+  .tag-medical { background: var(--tag-medical); }
+  .tag-secondary { background: var(--tag-secondary); color: #000; }
+  .tag-content { background: var(--tag-content); }
+  .tag-legal { background: var(--tag-legal); }
+  .tag-fund { background: var(--tag-fund); }
+  .tag-admin { background: var(--tag-admin); color: #000; }
+
+  /* Skill List */
+  .skill-list { list-style: none; padding: 0; }
+  .skill-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .skill-item .skill-name {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .skill-item .skill-desc {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+  .skill-item .skill-usage {
+    font-size: 0.85em;
+    color: var(--primary);
+    margin-top: 6px;
+    background: #eff6ff;
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+
+  /* Tips */
+  .tip-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .tip-box.good {
+    background: #f0fdf4;
+    border-color: #86efac;
+  }
+  .tip-box.warn {
+    background: #fefce8;
+    border-color: #fde68a;
+  }
+  .tip-box .label {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  /* FAQ */
+  .faq-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 8px;
+  }
+  .faq-item .q {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--primary);
+  }
+  .faq-item .a {
+    font-size: 0.95em;
+    color: var(--text-secondary);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--text-secondary);
+    font-size: 0.85em;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    .header h1 { font-size: 1.8em; }
+    .agent-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧭 火山石 AI 助手</h1>
+  <p>团队使用手册 — 让投资研究更高效</p>
+  <span class="version">v1.1 · 2026-06-15</span>
+</div>
+
+<nav class="nav-bar">
+  <a href="#quickstart">快速上手</a>
+  <a href="#agents">团队介绍</a>
+  <a href="#skills">技能清单</a>
+  <a href="#tips">使用技巧</a>
+  <a href="#faq">FAQ</a>
+</nav>
+
+<div class="container">
+
+  <!-- 快速上手 -->
+  <div class="section" id="quickstart">
+    <div class="section-title">🚀 快速上手</div>
+    <div class="tip-box">
+      <div class="label">💬 怎么用？</div>
+      <p>打开飞书，搜索 <strong>「AI老大」</strong> 机器人，直接私聊它说话即可。</p>
+    </div>
+    <ul style="padding-left:20px;margin-bottom:16px;">
+      <li><strong>给我一个任务描述</strong>，我会自动分派给最合适的助手</li>
+      <li>不需要记谁负责什么，<strong>直接说需求就行</strong></li>
+      <li>复杂任务我会拆解、分派、汇总成一条回复给你</li>
+    </ul>
+    <div class="tip-box warn">
+      <div class="label">💡 团队协作</div>
+      <p>可以拉群把 <strong>AI老大</strong> 加进群聊，群内 @ 它即可使用。</p>
+    </div>
+  </div>
+
+  <!-- 团队介绍 -->
+  <div class="section" id="agents">
+    <div class="section-title">👥 团队介绍</div>
+    <p style="color:var(--text-secondary);margin-bottom:20px;">这些人（AI 助手）在背后帮你——你只需要对 AI老大 说需求，我来安排。</p>
+
+    <div class="agent-grid">
+
+      <div class="agent-card">
+        <div class="name">🧭 主管 Main</div>
+        <div class="focus">总控与任务分派 · Chief of Staff</div>
+        <ul>
+          <li>统筹需求、拆解任务、分派给专项助手</li>
+          <li>汇总多个结果成清晰行动方案</li>
+        </ul>
+        <div style="margin-top:10px;"><span class="badge badge-ok">✅ 飞书机器人</span></div>
+      </div>
+
+      <div class="agent-card">
+        <div class="name">🤖 AI 投研助手 <span class="agent-tag tag-ai">AI</span></div>
+        <div class="focus">AI 行业 · 大模型 · AI Infra · AI 应用</div>
+        <ul>
+          <li>AI 公司技术和竞争格局分析</li>
+          <li>OpenAI / Anthropic / 国内大模型动态追踪</li>
+          <li>AI 赛道扫描和投资备忘录撰写</li>
+        </ul>
+        <div style="margin-top:10px;"><span class="badge badge-ok">✅ 飞书机器人</span></div>
+      </div>
+
+      <div class="agent-card">
+        <div class="name">💻 硬科技投研助手 <span class="agent-tag tag-hardtech">硬科技</span></div>
+        <div class="focus">半导体 · 智能制造 · 机器人 · 新能源</div>
+        <ul>
+          <li>技术路线对比和国产替代分析</li>
+          <li>专利/IP 壁垒评估</li>
+          <li>火山石已投：极智嘉、傅利叶、灿芯、奕行智能、忱芯等</li>
+        </ul>
+        <div style="margin-top:10px;"><span class="badge badge-ok">✅ 飞书机器人</span></div>
+      </div>
+
+      <div class="agent-card">
+        <div class="name">💊 医疗健康投研助手 <span class="agent-tag tag-medical">医疗</span></div>
+        <div class="focus">生物医药 · 医疗器械 · 数字健康 · CGT</div>
+        <ul>
+          <li>管线进展和临床阶段分析</li>
+          <li>NMPA/FDA 监管路径评估</li>
+          <li>火山石已投：宸安生物、三迭纪、佳量、凡恩世、同心等</li>
+        </ul>
+        <div style="margin-top:10px;"><span class="badge badge-ok">✅ 飞书机器人</span></div>
+      </div>
+
+      <div class="agent-card">
+        <div class="name">📈 二级市场助手 <span class="agent-tag tag-secondary">二级</span></div>
+        <div class="focus">IPO 追踪 · 估值分析 · 板块趋势</div>
+        <ul>
+          <li>可比公司估值分析（P/E、P/S 等）</li>
+          <li>IPO 进展跟踪和解禁节奏</li>
+          <li>一二级估值对比</li>
+        </ul>
+        <div style="margin-top:10px;"><span class="badge badge-ok">✅ 飞书机器人</span></div>
+      </div>
+
+      <div class="agent-card">
+        <div class="name">📝 内容品牌助手 <span class="agent-tag tag-content">内容</span></div>
+        <div class="focus">品牌内容 · 投后月报 · 公众号</div>
+        <ul>
+          <li>被投公司月度公众号文章整理</li>
+          <li>行业洞见和品牌文案</li>
+          <li>LP 报告</li>
+        </ul>
+        <div style="margin-top:10px;"><span class="badge badge-ok">✅ 飞书机器人</span></div>
+      </div>
+
+      <div class="agent-card">
+        <div class="name">⚖️ 法务助手 <span class="agent-tag tag-legal">法务</span></div>
+        <div class="focus">合同审查 · 基金合规 · 投后法律</div>
+        <ul>
+          <li>SPA/SHA/员工期权等条款理解</li>
+          <li>基金备案合规咨询</li>
+          <li>被投公司法律事项梳理</li>
+        </ul>
+        <div style="margin-top:10px;">
+          <span class="badge badge-ok">✅ 飞书机器人</span>
+          <span style="font-size:0.8em;color:var(--warning);margin-left:6px;">⚠️ 重大结论需律师复核</span>
+        </div>
+      </div>
+
+      <div class="agent-card">
+        <div class="name">💰 募资运营助手 <span class="agent-tag tag-fund">募资</span></div>
+        <div class="focus">LP 沟通 · 基金运营 · 募资备忘录</div>
+        <ul>
+          <li>LP 报告和 DDQ 准备</li>
+          <li>基金运营数据整理</li>
+          <li>投资人关系维护材料</li>
+        </ul>
+        <div style="margin-top:10px;"><span class="badge badge-ok">✅ 飞书机器人</span></div>
+      </div>
+
+      <div class="agent-card">
+        <div class="name">📋 行政生活助手 <span class="agent-tag tag-admin">行政</span></div>
+        <div class="focus">日程 · 差旅 · 内部事务</div>
+        <ul>
+          <li>会议安排和日程协调</li>
+          <li>差旅预订建议</li>
+          <li>内部知识库和活动策划</li>
+        </ul>
+        <div style="margin-top:10px;"><span class="badge badge-ok">✅ 飞书机器人</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 技能清单 -->
+  <div class="section" id="skills">
+    <div class="section-title">🎯 技能清单</div>
+    <p style="color:var(--text-secondary);margin-bottom:20px;">以下技能由 AI老大 自动调用，你也可以在任务中直接点名使用。</p>
+
+    <div class="section-subtitle">📰 每日早间简报</div>
+    <div class="skill-item">
+      <div class="skill-name">⏰ 每日 8:00 自动推送</div>
+      <div class="skill-desc">覆盖宏观政策、AI×消费硬件、公司动态、融资IPO、资本市场、KOL观点、行业活动、社会趋势、硬科技 9 大板块。每篇新闻附原文链接。</div>
+      <div class="skill-usage">无需操作，自动送达。如需调整方向，对 AI老大 说「帮我多关注xxx」</div>
+    </div>
+
+    <div class="section-subtitle">🤖 行业研报分析</div>
+
+    <div class="skill-item">
+      <div class="skill-name">📊 行业概览 · sector-overview</div>
+      <div class="skill-desc">快速了解一个行业的市场规模、增长驱动、价值链、竞争格局、投资启示。</div>
+      <div class="skill-usage">说「帮我看看xxx赛道」</div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-name">⚔️ 竞争格局分析 · competitive-analysis</div>
+      <div class="skill-desc">市场定位、竞品 Deep-dive、多维度对比、战略综合。</div>
+      <div class="skill-usage">说「对比一下xxx和xxx」</div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-name">📈 可比公司分析 · comps-analysis</div>
+      <div class="skill-desc">运营指标、估值倍数、统计基准的 Excel/电子表格分析。</div>
+      <div class="skill-usage">说「做个xxx的估值对标」</div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-name">💡 投资想法生成 · idea-generation</div>
+      <div class="skill-desc">量化筛选、主题研究、模式识别、做多/做空想法。</div>
+      <div class="skill-usage">说「这个赛道有什么投资机会」</div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-name">📄 研报 PPT 生成 · pptx-author</div>
+      <div class="skill-desc">从零生成 .pptx 格式的研究报告幻灯片，无需 Office 依赖。</div>
+      <div class="skill-usage">说「帮我生成一份xxx的研报PPT」</div>
+    </div>
+
+    <div class="section-subtitle">🗂️ 投后月报</div>
+    <div class="skill-item">
+      <div class="skill-name">📝 月度公众号内容整理</div>
+      <div class="skill-desc">火山石被投公司公众号文章，按 AI与硬科技 / 医疗健康 分类整理，每篇配 150 字浓缩版和原文链接。</div>
+      <div class="skill-usage">把 mp.weixin.qq.com 链接发过来，说「加到月报里」</div>
+    </div>
+
+    <div class="section-subtitle">📄 飞书生态</div>
+    <div class="skill-item">
+      <div class="skill-name">📝 飞书文档 · feishu-doc</div>
+      <div class="skill-desc">读取和编辑飞书文档。</div>
+      <div class="skill-usage">说「帮我把这个文档整理一下」</div>
+    </div>
+    <div class="skill-item">
+      <div class="skill-name">💾 飞书云盘 · feishu-drive</div>
+      <div class="skill-desc">管理云盘文件。</div>
+      <div class="skill-usage">说「帮我找一下云盘里的xxx」</div>
+    </div>
+    <div class="skill-item">
+      <div class="skill-name">📚 飞书知识库 · feishu-wiki</div>
+      <div class="skill-desc">查阅知识库内容。</div>
+      <div class="skill-usage">说「查一下知识库里关于xxx的内容」</div>
+    </div>
+    <div class="skill-item">
+      <div class="skill-name">🔑 飞书权限 · feishu-perm</div>
+      <div class="skill-desc">管理文档权限和分享。</div>
+      <div class="skill-usage">说「把这个文档分享给xxx」</div>
+    </div>
+
+    <div class="section-subtitle">🔧 其他实用工具</div>
+
+    <div class="skill-item">
+      <div class="skill-name">🌐 网页搜索</div>
+      <div class="skill-desc">自动搜索最新信息。优先 Tavily，不可用时自动切换 AnySearch。</div>
+      <div class="skill-usage">直接问问题即可，系统自动搜索</div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-name">📎 网页内容抓取</div>
+      <div class="skill-desc">读取任意网页内容并提取有效信息。</div>
+      <div class="skill-usage">直接发链接给 AI老大</div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-name">🌤️ 天气查询</div>
+      <div class="skill-desc">当前天气和未来预报。</div>
+      <div class="skill-usage">「上海今天天气怎么样」</div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-name">🖼️ 图像识别/生成</div>
+      <div class="skill-desc">分析图片内容或生成图片。</div>
+      <div class="skill-usage">发图片分析，或说「帮我画一张xxx」</div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-name">⏰ 提醒与备忘录</div>
+      <div class="skill-desc">定时提醒和通知。</div>
+      <div class="skill-usage">「提醒我下午3点开会」</div>
+    </div>
+
+  </div>
+
+  <!-- 使用技巧 -->
+  <div class="section" id="tips">
+    <div class="section-title">💡 使用技巧</div>
+
+    <div class="tip-box good">
+      <div class="label">✅ 好的提问方式</div>
+      <p style="margin-bottom:6px;"><strong>❌</strong> 「帮我看个公司」→ 信息不足</p>
+      <p style="margin-bottom:6px;"><strong>✅</strong> 「帮我看一下xxx公司，它在做AI芯片，关注产品进度和融资情况」→ 明确</p>
+      <p style="margin-bottom:6px;"><strong>❌</strong> 「研究一下AI赛道」→ 太宽泛</p>
+      <p style="margin-bottom:6px;"><strong>✅</strong> 「研究一下AI Agent赛道，重点关注面向开发者的工具型公司」→ 具体</p>
+      <p><strong>❌</strong> 「写个报告」→ 缺目标</p>
+      <p><strong>✅</strong> 「写一份xxx行业的投资备忘录，核心问题是看这个赛道值不值得进入」→ 有决策场景</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="label">💡 常见用法示例</div>
+      <ul style="padding-left:20px;">
+        <li><strong>快速扫描</strong>：「最近AI眼镜赛道有什么新动态？」</li>
+        <li><strong>深度研究</strong>：「帮我做个xxx和xxx的竞品对比，从技术路线、融资节奏、商业化进展三个维度」</li>
+        <li><strong>跟踪提醒</strong>：「帮我关注xxx公司，有融资新闻通知我」</li>
+        <li><strong>整理总结</strong>：「帮我把这5篇文章整理成一份摘要」</li>
+        <li><strong>翻译/改写</strong>：「帮我把这段英文翻译成中文，保持投资语言风格」</li>
+      </ul>
+    </div>
+
+    <div class="tip-box warn">
+      <div class="label">⚠️ 注意事项</div>
+      <ul style="padding-left:20px;">
+        <li><strong>信息需要核实</strong> — AI 助手信息来自公开搜索，重要数据建议交叉验证</li>
+        <li><strong>法律意见需专业复核</strong> — 法务助手提供信息整理，重大结论需律师确认</li>
+        <li><strong>保密信息谨慎输入</strong> — 不要在对话中输入不想对外分享的敏感信息</li>
+        <li><strong>时效性</strong> — 搜索结果有时效性，3个月前的信息会自动标注</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section" id="faq">
+    <div class="section-title">❓ FAQ</div>
+
+    <div class="faq-item">
+      <div class="q">Q：我想让某个助手专门做一件事，怎么指定？</div>
+      <div class="a">直接说就行。比如「让内容助手帮我整理月报」「让法务助手看看这个条款」。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="q">Q：AI老大回复太慢怎么办？</div>
+      <div class="a">复杂任务（如竞品分析、研报生成）需要几分钟。简单问答应该是秒回。如果长时间无响应，可以问「还在处理吗？」</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="q">Q：可以同时问多个问题吗？</div>
+      <div class="a">建议一次一个问题。复杂任务我会自动拆解。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="q">Q：数据安全怎么样？</div>
+      <div class="a">所有对话在内部服务器处理。但建议不要在对话中输入密码、密钥等敏感信息。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="q">Q：我想让团队其他成员也用上，怎么做？</div>
+      <div class="a">拉群把 AI老大 加进去就可以了。群聊里每个人都能 @ 它。</div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>火山石投资 · AI老大团队</p>
+  <p style="margin-top:4px;">本手册持续更新。有功能建议或问题，直接对 AI老大 说。</p>
+</div>
+
+</body>
+</html>
